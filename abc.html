@@ -3,22 +3,51 @@
 <head>
 	<meta charset="utf-8">
 	<title>Sign Out</title>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1032.0.min.js"></script>
 </head>
 <body>
-<pre>
-	DynamoDB: 免费25GB存储空间，每月2亿次请求
-	Key-Value NoSql 非关系型数据库 无需表格式
-	AWS提供了JavaScript的SDK，通过它访问亚马逊云上的DynamoDB
-	身份验证需要使用Amazon Cognito 
-	用户池 | User Pool
-	1. 给Web应用程序添加“注册”和“登录”功能
+    <div id="textToSynth">
+      <input autofocus size="23" type="text" id="textEntry" value="It's very good to meet you."/>
+      <button class="btn default" onClick="speakText()">Synthesize</button>
+      <p id="result">Enter text above then click Synthesize</p>
+    </div>
+    <audio id="audioPlayback" controls>
+      <source id="audioSource" type="audio/mp3" src="">
+    </audio>
+    <script type="text/javascript">
 
-	身份池 | Identity Pool
-	1. 给用户分配权限，访问后端资源的权限，如DynamoDB等后端资源
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-west-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-west-1:1802a9c7-7061-451e-8f3a-f21ba70f52f6'});
 
-	用用户池登录，用身份池访问DynamoDB
-	鉴权成功后Web app会从Cognito接收到用户池的token。用这些tokens获得AWS授权，以访问AWS的服务。
+        // Function invoked by button click
+        function speakText() {
+            // Create the JSON parameters for getSynthesizeSpeechUrl
+            var speechParams = {
+                OutputFormat: "mp3",
+                SampleRate: "16000",
+                Text: "",
+                TextType: "text",
+                VoiceId: "Matthew"
+            };
+            speechParams.Text = document.getElementById("textEntry").value;
+                    // Create the Polly service object and presigner object
+            var polly = new AWS.Polly({apiVersion: '2016-06-10'});
+            var signer = new AWS.Polly.Presigner(speechParams, polly)
 
-</pre>
+            // Create presigned URL of synthesized speech file
+            signer.getSynthesizeSpeechUrl(speechParams, function(error, url) {
+            if (error) {
+                document.getElementById('result').innerHTML = error;
+            } else {
+                document.getElementById('audioSource').src = url;
+                document.getElementById('audioPlayback').load();
+                document.getElementById('result').innerHTML = "Speech ready to play.";
+            }
+          });
+        }
+    </script>
+
+
 </body>
 </html>
