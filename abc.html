@@ -1,0 +1,24 @@
+<<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Sign Out</title>
+</head>
+<body>
+<pre>
+	DynamoDB: 免费25GB存储空间，每月2亿次请求
+	Key-Value NoSql 非关系型数据库 无需表格式
+	AWS提供了JavaScript的SDK，通过它访问亚马逊云上的DynamoDB
+	身份验证需要使用Amazon Cognito 
+	用户池 | User Pool
+	1. 给Web应用程序添加“注册”和“登录”功能
+
+	身份池 | Identity Pool
+	1. 给用户分配权限，访问后端资源的权限，如DynamoDB等后端资源
+
+	用用户池登录，用身份池访问DynamoDB
+	鉴权成功后Web app会从Cognito接收到用户池的token。用这些tokens获得AWS授权，以访问AWS的服务。
+
+</pre>
+</body>
+</html>
