@@ -1,0 +1,18 @@
+{
+  "name": "aws-exp-dynamodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.42.0",
+    "@aws-sdk/credential-providers": "^3.42.0",
+    "aws-sdk": "^2.1034.0",
+    "import": "^0.0.6"
+  }
+}
