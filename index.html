@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<title>Playground</title>
 	<script src="https://unpkg.com/vue@next"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1032.0.min.js"></script>
 	<style type="text/css">
 	.demo {
 		font-family: sans-serif;
@@ -18,10 +19,15 @@
 	</style>
 </head>
 <body>
-	<script src="hi.js"></script>
+
 	<p>Here is a hello world.</p>
 	<div id="hello-vue" class="demo"> {{ message }}</div>
-	<script>hi("Kangaroo")</script>
+	<script type="module">
+        import { AmazonCognitoIdentity } from "/node_modules/@aws-sdk/client-cognito-identity-provider";
+        import {hi} from "./hi.js";
+        
+        hi("Kangaroo")
+    </script>
 
 </body>
 </html>

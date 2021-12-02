@@ -1,3 +1,5 @@
+
+
 const HelloVueApp = {
 	data() {
 		return {
@@ -6,7 +8,8 @@ const HelloVueApp = {
 	}
 }
 
-function hi(name) {
+export function hi(name) {
 	let phrase = `Hello, ${name}`;
 	Vue.createApp(HelloVueApp).mount('#hello-vue');
+
 }
