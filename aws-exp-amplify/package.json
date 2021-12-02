@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.10.1",
+    "@vue/compiler-sfc": "^3.2.23",
+    "vite": "^2.6.14"
+  },
+  "dependencies": {
+    "@aws-amplify/ui-components": "^1.9.6",
+    "@aws-amplify/ui-vue": "^2.0.3",
+    "aws-amplify": "^4.3.8",
+    "vue": "^3.2.23"
+  }
+}
