@@ -1,0 +1,83 @@
+9/ld: /lib/libgstreamer-1.0.a(gst.c.o): in function `init_static_plugins':
+/_builddir/../gst/gst.c:645: undefined reference to `g_module_open'
+9/ld: /_builddir/../gst/gst.c:648: undefined reference to `g_module_symbol'
+9/ld: /_builddir/../gst/gst.c:652: undefined reference to `g_module_close'
+9/ld: /lib/libgstreamer-1.0.a(gstdatetime.c.o): in function `gst_date_time_new_from_iso8601_string':
+/_builddir/../gst/gstdatetime.c:958: undefined reference to `pow'
+9/ld: /lib/libgstreamer-1.0.a(gstinfo.c.o): in function `generate_unwind_trace':
+/_builddir/../gst/gstinfo.c:2932: undefined reference to `_Ux86_64_getcontext'
+9/ld: /_builddir/../gst/gstinfo.c:2938: undefined reference to `_ULx86_64_init_local'
+9/ld: /_builddir/../gst/gstinfo.c:2974: undefined reference to `_ULx86_64_get_proc_name'
+9/ld: /_builddir/../gst/gstinfo.c:2951: undefined reference to `_ULx86_64_step'
+9/ld: /lib/libgstreamer-1.0.a(gstinfo.c.o): in function `_gst_debug_nameof_funcptr':
+/_builddir/../gst/gstinfo.c:2219: undefined reference to `dladdr'
+9/ld: /lib/libgstreamer-1.0.a(gstplugin.c.o): in function `gst_plugin_register_func':
+/_builddir/../gst/gstplugin.c:519: undefined reference to `g_module_make_resident'
+9/ld: /lib/libgstreamer-1.0.a(gstplugin.c.o): in function `_priv_gst_plugin_load_file_for_registry':
+/_builddir/../gst/gstplugin.c:764: undefined reference to `g_module_supported'
+9/ld: /_builddir/../gst/gstplugin.c:800: undefined reference to `g_module_open'
+9/ld: /_builddir/../gst/gstplugin.c:815: undefined reference to `g_module_symbol'
+9/ld: /_builddir/../gst/gstplugin.c:823: undefined reference to `g_module_symbol'
+9/ld: /_builddir/../gst/gstplugin.c:802: undefined reference to `g_module_error'
+9/ld: /_builddir/../gst/gstplugin.c:804: undefined reference to `g_module_error'
+9/ld: /_builddir/../gst/gstplugin.c:810: undefined reference to `g_module_error'
+9/ld: /_builddir/../gst/gstplugin.c:846: undefined reference to `g_module_close'
+
+
+
+
+9/ld: /lib/libgobject-2.0.a(gclosure.c.o): in function `value_to_ffi_type':
+/_builddir/../gobject/gclosure.c:1249: undefined reference to `ffi_type_pointer'
+9/ld: /_builddir/../gobject/gclosure.c:1221: undefined reference to `ffi_type_pointer'
+9/ld: /_builddir/../gobject/gclosure.c:1186: undefined reference to `ffi_type_sint32'
+9/ld: /_builddir/../gobject/gclosure.c:1237: undefined reference to `ffi_type_uint64'
+9/ld: /_builddir/../gobject/gclosure.c:1233: undefined reference to `ffi_type_sint64'
+9/ld: /_builddir/../gobject/gclosure.c:1211: undefined reference to `ffi_type_uint32'
+9/ld: /_builddir/../gobject/gclosure.c:1197: undefined reference to `ffi_type_sint32'
+9/ld: /_builddir/../gobject/gclosure.c:1229: undefined reference to `ffi_type_double'
+9/ld: /_builddir/../gobject/gclosure.c:1225: undefined reference to `ffi_type_float'
+9/ld: /_builddir/../gobject/gclosure.c:1204: undefined reference to `ffi_type_uint32'
+9/ld: /lib/libgobject-2.0.a(gclosure.c.o): in function `g_cclosure_marshal_generic':
+/_builddir/../gobject/gclosure.c:1458: undefined reference to `ffi_type_void'
+9/ld: /_builddir/../gobject/gclosure.c:1473: undefined reference to `ffi_type_pointer'
+9/ld: /_builddir/../gobject/gclosure.c:1497: undefined reference to `ffi_prep_cif'
+9/ld: /_builddir/../gobject/gclosure.c:1500: undefined reference to `ffi_call'
+9/ld: /_builddir/../gobject/gclosure.c:1482: undefined reference to `ffi_type_pointer'
+9/ld: /lib/libgobject-2.0.a(gclosure.c.o): in function `g_cclosure_marshal_generic_va':
+/_builddir/../gobject/gclosure.c:1556: undefined reference to `ffi_type_void'
+9/ld: /_builddir/../gobject/gclosure.c:1568: undefined reference to `ffi_type_pointer'
+9/ld: /lib/libgobject-2.0.a(gclosure.c.o): in function `va_to_ffi_type':
+/_builddir/../gobject/gclosure.c:1395: undefined reference to `ffi_type_uint64'
+9/ld: /_builddir/../gobject/gclosure.c:1391: undefined reference to `ffi_type_sint64'
+9/ld: /_builddir/../gobject/gclosure.c:1375: undefined reference to `ffi_type_float'
+9/ld: /lib/libgobject-2.0.a(gclosure.c.o): in function `g_cclosure_marshal_generic_va':
+/_builddir/../gobject/gclosure.c:1611: undefined reference to `ffi_prep_cif'
+9/ld: /_builddir/../gobject/gclosure.c:1614: undefined reference to `ffi_call'
+9/ld: /_builddir/../gobject/gclosure.c:1575: undefined reference to `ffi_type_pointer'
+9/ld: /lib/libgobject-2.0.a(gclosure.c.o): in function `va_to_ffi_type':
+/_builddir/../gobject/gclosure.c:1379: undefined reference to `ffi_type_double'
+9/ld: /_builddir/../gobject/gclosure.c:1360: undefined reference to `ffi_type_uint32'
+9/ld: /_builddir/../gobject/gclosure.c:1354: undefined reference to `ffi_type_sint32'
+collect2: error: ld returned 1 exit status
+
+
+
+-pthread
+-I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/include/gstreamer-1.0
+-I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/include
+-I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/include/glib-2.0
+-I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/lib/glib-2.0/include
+-L/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/lib
+
+-lgstreamer-1.0 -lgobject-2.0 -lglib-2.0  
+
+
+
+gcc -O0 -g -Wall main.c -pthread -pthread -I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/include/gstreamer-1.0 -I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/include -I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/include/glib-2.0 -I/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/lib/glib-2.0/include -L/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/lib
+
+PKG_CONFIG_PATH=/root/WebRTC/gstreamer/cerbero/build/dist/linux_x86_64/lib/pkgconfig
+gcc -O0 -g -Wall main.c $(pkg-config --static --cflags --libs gstreamer-1.0)
+
+https://github.com/pion/example-webrtc-applications
+http://blog.nirbheek.in/2018/02/gstreamer-webrtc.html
+Read the official tutorial to get insights of using appsrc to inject data into GStreamer Pipelines.
