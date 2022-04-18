@@ -30,27 +30,34 @@ static void NetShowInfo(const struct addrinfo &ai)
     char ip[16] {};
     uint16_t port = 0;
     struct sockaddr_in *sin = nullptr;
+    const struct addrinfo *ai_iterator = &ai;
 
-    if (ai.ai_family == AF_INET)
-        std::cout << "ai_family   : AF_INET (IPv4)" << std::endl;
-    else if (ai.ai_family == AF_INET6)
-        std::cout << "ai_family   : AF_INET (IPv6)" << std::endl;
-    else
-        std::cout << "ai_family   : Unknown" << std::endl;
+    while (ai_iterator) {
+        if (ai_iterator->ai_family == AF_INET)
 
-    if (ai.ai_socktype == SOCK_STREAM)
-        std::cout << "ai_socktype : SOCK_STREAM (tcp)" << std::endl;
-    else
-        std::cout << "ai_socktype : wrong type" << std::endl;
+            std::cout << "ai_family   : AF_INET (IPv4)" << std::endl;
+        else if (ai_iterator->ai_family == AF_INET6)
+            std::cout << "ai_family   : AF_INET (IPv6)" << std::endl;
+        else
+            std::cout << "ai_family   : Unknown" << std::endl;
 
-    std::cout << "ai_protocol : " << ai.ai_protocol
-              << " (/etc/protocols: tcp = 6)"  << std::endl;
+        if (ai_iterator->ai_socktype == SOCK_STREAM)
+            std::cout << "ai_socktype : SOCK_STREAM (tcp)" << std::endl;
+        else
+            std::cout << "ai_socktype : wrong type" << std::endl;
 
-    sin = (struct sockaddr_in*)ai.ai_addr;
-    inet_ntop(ai.ai_family, &sin->sin_addr, ip, sizeof(ip));
-    port = htons(sin->sin_port);
-    std::cout << "ai_addr.ip  : " << ip << std::endl;
-    std::cout << "ai_addr.port: " << port << std::endl;
+        std::cout << "ai_protocol : " << ai_iterator->ai_protocol
+                  << " (/etc/protocols: tcp = 6)"  << std::endl;
+
+        sin = (struct sockaddr_in*)ai_iterator->ai_addr;
+        inet_ntop(ai_iterator->ai_family, &sin->sin_addr, ip, sizeof(ip));
+        port = htons(sin->sin_port);
+        std::cout << "ai_addr.ip  : " << ip << std::endl;
+        std::cout << "ai_addr.port: " << port << std::endl;
+        std::cout << "======================================" << std::endl;
+
+        ai_iterator = ai_iterator->ai_next;
+    }
     return;
 }
 
@@ -68,15 +75,16 @@ int TcpContext::TcpOpen(const std::string &ip, const std::string &port)
     int ret = -1;
     int sockfd = -1, connfd;
 
+    if (port.empty()) {
+        std::cout << "TcpContext::TcpOpen(" << port << "): "
+            "Invalid Argument - Have to spcify a valid port." << std::endl;
+        return -1;
+    }
+
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags += AI_PASSIVE;
-    if (ip.empty())
-        std::cout << "ip.empty() is true. " << std::endl;
-    else
-        std::cout << "ip.empty() is false, " << ip << std::endl;
-    ret = getaddrinfo(ip.empty() ? nullptr : ip.c_str(),
-                      port.empty() ? nullptr : port.c_str(), &hints, &ai);
+    ret = getaddrinfo(ip.empty() ? nullptr : ip.c_str(), port.c_str(), &hints, &ai);
     if (ret) {
         ret = NetError(ret);
         goto fail;
@@ -84,10 +92,17 @@ int TcpContext::TcpOpen(const std::string &ip, const std::string &port)
 
     NetShowInfo(*ai);
 
-    sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-    if (sockfd == -1) {
-        ret = NetError();
-        goto fail;
+    /**
+     * TODO:
+     * 1. wrap the following code for tcp server
+     * 2. check if _listen is 0, connect server directly for tcp client
+     */
+    if (_listen > 0) {
+        sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+        if (sockfd == -1) {
+            ret = NetError();
+            goto fail;
+        }
     }
 
     ret = bind(sockfd, ai->ai_addr, ai->ai_addrlen);
@@ -97,13 +112,12 @@ int TcpContext::TcpOpen(const std::string &ip, const std::string &port)
     }
 
     /**
-     * the backlog argument defines the maximum length to which
+     * `_listen` defines the maximum length to which
      * the queue of pending connections for sockfd may grow.
      * If a connection request arrives when the queue is full,
      * the client may receive an error with an indication of ECONNREFUSED. 
-     * It's set 1 here for single client.
      */
-    ret = listen(sockfd, 1);
+    ret = listen(sockfd, _listen);
     if (ret) {
         ret = NetError();
         goto fail;
