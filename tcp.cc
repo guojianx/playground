@@ -61,22 +61,43 @@ static void NetShowInfo(const struct addrinfo &ai)
     return;
 }
 
+static int NetListenBind(int &sockfd, const struct addrinfo *ai, int backlog)
+{
+    int ret;
+
+    ret = bind(sockfd, ai->ai_addr, ai->ai_addrlen);
+    if (ret)
+        return NetError();
+
+    ret = listen(sockfd, backlog);
+    if (ret)
+        return NetError();
+
+    ret = accept(sockfd, nullptr, nullptr);
+    if (ret < 0)
+        return NetError();
+
+    close(sockfd);
+    sockfd = ret;
+    return 0;
+}
+
 TcpContext::TcpContext(int listen) :
-    _sockfd(-1), _connfd(-1), _listen(listen)
+    _fd(-1), _listen(listen)
 { }
 
 TcpContext::~TcpContext()
 { }
 
-int TcpContext::TcpOpen(const std::string &ip, const std::string &port)
+int TcpContext::Open(const std::string &ip, const std::string &port)
 {
     struct addrinfo hints {};
     struct addrinfo *ai = nullptr;
     int ret = -1;
-    int sockfd = -1, connfd;
+    int sockfd = -1;
 
     if (port.empty()) {
-        std::cout << "TcpContext::TcpOpen(" << port << "): "
+        std::cout << "TcpContext::Open(" << port << "): "
             "Invalid Argument - Have to spcify a valid port." << std::endl;
         return -1;
     }
@@ -96,41 +117,39 @@ int TcpContext::TcpOpen(const std::string &ip, const std::string &port)
      * TODO:
      * 1. wrap the following code for tcp server
      * 2. check if _listen is 0, connect server directly for tcp client
+     * - [ ] if _listen == 0:
+     *     sockfd = socket(...);
+     *     fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | O_NONBLOCK);  // nonblock
+     *     connect(sockfd, ai->ai_addr, ai->ai_addrlen);
+     * - [X] elif _listen > 0:
+     *     sockfd = socket(...);
+     *     bind(sockfd, ai->ai_addr, ai->ai_addrlen);
+     *     listen(sockfd, 1);
+     *     connfd = accept(sockfd, nullptr, nullptr);
+     *     close(sockfd);
+     *     sockfd = connfd;
      */
+    sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+    if (sockfd == -1) {
+        ret = NetError();
+        goto fail;
+    }
+
     if (_listen > 0) {
-        sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-        if (sockfd == -1) {
-            ret = NetError();
-            goto fail;
-        }
-    }
-
-    ret = bind(sockfd, ai->ai_addr, ai->ai_addrlen);
-    if (ret) {
-        ret = NetError();
-        goto fail;
-    }
-
-    /**
-     * `_listen` defines the maximum length to which
-     * the queue of pending connections for sockfd may grow.
-     * If a connection request arrives when the queue is full,
-     * the client may receive an error with an indication of ECONNREFUSED. 
-     */
-    ret = listen(sockfd, _listen);
-    if (ret) {
-        ret = NetError();
-        goto fail;
-    }
-
-    connfd = accept(sockfd, nullptr, nullptr);
-    if (connfd < 0) {
-        NetError();
-        goto fail;
+        /**
+         * `_listen` defines the maximum length to which
+         * the queue of pending connections for sockfd may grow.
+         * If a connection request arrives when the queue is full,
+         * the client may receive an error with an indication of ECONNREFUSED. 
+         */
+        /* this mutates the sockfd, it will be the connection fd */
+        ret = NetListenBind(sockfd, ai, _listen);
+        if (ret)
+            goto fail;    
     }
 
     freeaddrinfo(ai);
-    _sockfd = sockfd;
+    _fd = sockfd;
     return 0;
 
 fail:

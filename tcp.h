@@ -15,11 +15,10 @@ public:
 
     virtual ~TcpContext();
 
-    int TcpOpen(const std::string &hostname, const std::string &port);
+    int Open(const std::string &hostname, const std::string &port);
 
 private:
-    int _sockfd;
-    int _connfd;
+    int _fd;
     int _listen;
 };
 

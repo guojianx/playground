@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv)
 {
-    TcpContext tcp(0);
-    tcp.TcpOpen("", "21111");
+    TcpContext tcp(1);
+    tcp.Open("", "21111");
     return 0;
 }
