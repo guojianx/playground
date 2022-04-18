@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 
+#include <unistd.h>
 #include <string.h>
 #include <sys/types.h>          /* See NOTES */
 #include <sys/socket.h>
@@ -28,18 +29,19 @@ void NetShowInfo(const struct addrinfo &ai)
     struct sockaddr_in *sin = nullptr;
 
     if (ai.ai_family == AF_INET)
-        std::cout << "ai_family: AF_INET (IPv4)" << std::endl;
+        std::cout << "ai_family   : AF_INET (IPv4)" << std::endl;
     else if (ai.ai_family == AF_INET6)
-        std::cout << "ai_family: AF_INET (IPv6)" << std::endl;
+        std::cout << "ai_family   : AF_INET (IPv6)" << std::endl;
     else
-        std::cout << "ai_family: Unknown" << std::endl;
+        std::cout << "ai_family   : Unknown" << std::endl;
 
     if (ai.ai_socktype == SOCK_STREAM)
-        std::cout << "ai_socktype: SOCK_STREAM (tcp)" << std::endl;
+        std::cout << "ai_socktype : SOCK_STREAM (tcp)" << std::endl;
     else
-        std::cout << "ai_socktype: wrong type" << std::endl;
+        std::cout << "ai_socktype : wrong type" << std::endl;
 
-    std::cout <<  "ai_protocol: " << ai.ai_protocol << std::endl;
+    std::cout << "ai_protocol : " << ai.ai_protocol
+              << " (/etc/protocols: tcp = 6)"  << std::endl;
 
     sin = (struct sockaddr_in*)ai.ai_addr;
     inet_ntop(ai.ai_family, &sin->sin_addr, ip, sizeof(ip));
@@ -47,6 +49,15 @@ void NetShowInfo(const struct addrinfo &ai)
     std::cout << "ai_addr.ip  : " << ip << std::endl;
     std::cout << "ai_addr.port: " << port << std::endl;
     return;
+}
+
+void NetFreePtr(void *arg)
+{
+    void *val;
+    void *NullPtr = nullptr;
+    memcpy(&val, arg, sizeof(val));
+    memcpy(arg, &NullPtr, sizeof(val));
+    free(val);
 }
 
 int main(int argc, char **argv)
@@ -67,25 +78,43 @@ int main(int argc, char **argv)
 
     NetShowInfo(*ai);
 
-    /**
-     * domain   = AF_INET     for IPv4
-     * type     = SOCK_STREAM for TCP
-     * protocol = 0
-     */
     sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
     if (sockfd == -1) {
         ret = NetError();
         goto fail;
     }
 
-    /*
-    ret = bind(sockfd, addr, addrlen);
+    ret = bind(sockfd, ai->ai_addr, ai->ai_addrlen);
     if (ret) {
         ret = NetError();
+        goto fail;
+    }
+
+    /**
+     * the backlog argument defines the maximum length to which
+     * the queue of pending connections for sockfd may grow.
+     * If a connection request arrives when the queue is full,
+     * the client may receive an error with an indication of ECONNREFUSED. 
+     * It's set 1 here for single client.
+     */
+    ret = listen(sockfd, 1);
+    if (ret) {
+        ret = NetError();
+        goto fail;
+    }
+
+    /*
+    ret = accept(sockfd, nullptr, nullptr);
+    if (ret < 0) {
+        NetError();
         goto fail;
     }
     */
 
 fail:
+    freeaddrinfo(ai);
+    close(sockfd);
+    sockfd = -1;
+    close(sockfd);
     return ret;
 }
