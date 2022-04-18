@@ -51,15 +51,6 @@ void NetShowInfo(const struct addrinfo &ai)
     return;
 }
 
-void NetFreePtr(void *arg)
-{
-    void *val;
-    void *NullPtr = nullptr;
-    memcpy(&val, arg, sizeof(val));
-    memcpy(arg, &NullPtr, sizeof(val));
-    free(val);
-}
-
 int main(int argc, char **argv)
 {
     struct addrinfo hints {};
@@ -70,7 +61,7 @@ int main(int argc, char **argv)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags += AI_PASSIVE;
-    ret = getaddrinfo(nullptr, "21111", &hints, &ai);
+    ret = getaddrinfo("172.16.11.237", "21111", &hints, &ai);
     if (ret) {
         ret = NetError(ret);
         goto fail;
