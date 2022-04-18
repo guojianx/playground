@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -82,12 +83,34 @@ static int NetListenBind(int &sockfd, const struct addrinfo *ai, int backlog)
     return 0;
 }
 
+static int NetConnect(int sockfd, const struct addrinfo *ai)
+{
+    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | O_NONBLOCK);  // nonblock
+
+    if (connect(sockfd, ai->ai_addr, ai->ai_addrlen))
+        return NetError();
+    else
+        return 0;
+}
+
 TcpContext::TcpContext(int listen) :
     _fd(-1), _listen(listen)
 { }
 
 TcpContext::~TcpContext()
-{ }
+{
+    Close();
+}
+
+int TcpContext::Close()
+{
+    if (_fd > 0) {
+        close(_fd);
+        _fd = -1;
+    }
+
+    return 0;
+}
 
 int TcpContext::Open(const std::string &ip, const std::string &port)
 {
@@ -113,22 +136,6 @@ int TcpContext::Open(const std::string &ip, const std::string &port)
 
     NetShowInfo(*ai);
 
-    /**
-     * TODO:
-     * 1. wrap the following code for tcp server
-     * 2. check if _listen is 0, connect server directly for tcp client
-     * - [ ] if _listen == 0:
-     *     sockfd = socket(...);
-     *     fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | O_NONBLOCK);  // nonblock
-     *     connect(sockfd, ai->ai_addr, ai->ai_addrlen);
-     * - [X] elif _listen > 0:
-     *     sockfd = socket(...);
-     *     bind(sockfd, ai->ai_addr, ai->ai_addrlen);
-     *     listen(sockfd, 1);
-     *     connfd = accept(sockfd, nullptr, nullptr);
-     *     close(sockfd);
-     *     sockfd = connfd;
-     */
     sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
     if (sockfd == -1) {
         ret = NetError();
@@ -146,6 +153,11 @@ int TcpContext::Open(const std::string &ip, const std::string &port)
         ret = NetListenBind(sockfd, ai, _listen);
         if (ret)
             goto fail;    
+    }
+    else {
+        ret = NetConnect(sockfd, ai);
+        if (ret)
+            goto fail;
     }
 
     freeaddrinfo(ai);

@@ -16,6 +16,7 @@ public:
     virtual ~TcpContext();
 
     int Open(const std::string &hostname, const std::string &port);
+    int Close(void);
 
 private:
     int _fd;
