@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     struct addrinfo hints {};
     struct addrinfo *ai = nullptr;
     int ret = -1;
-    int sockfd = -1;
+    int sockfd = -1, connfd;
 
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -103,13 +103,11 @@ int main(int argc, char **argv)
         goto fail;
     }
 
-    /*
-    ret = accept(sockfd, nullptr, nullptr);
-    if (ret < 0) {
+    connfd = accept(sockfd, nullptr, nullptr);
+    if (connfd < 0) {
         NetError();
         goto fail;
     }
-    */
 
 fail:
     freeaddrinfo(ai);
