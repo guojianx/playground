@@ -17,6 +17,8 @@ public:
 
     int Open(const std::string &hostname, const std::string &port);
     int Close(void);
+    int Read(uint8_t *buf, size_t buf_size);
+    int Write(uint8_t *buf, size_t buf_size);
 
 private:
     int _fd;

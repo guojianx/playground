@@ -85,7 +85,7 @@ static int NetListenBind(int &sockfd, const struct addrinfo *ai, int backlog)
 
 static int NetConnect(int sockfd, const struct addrinfo *ai)
 {
-    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | O_NONBLOCK);  // nonblock
+    //fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | O_NONBLOCK);  // nonblock
 
     if (connect(sockfd, ai->ai_addr, ai->ai_addrlen))
         return NetError();
@@ -110,6 +110,23 @@ int TcpContext::Close()
     }
 
     return 0;
+}
+
+int TcpContext::Read(uint8_t *buf, size_t size)
+{
+    int ret;
+    /* TODO: poll() wait for readable. */
+    
+    ret = recv(_fd, buf, size, 0);
+    return ret < 0 ? NetError() : ret;
+}
+
+int TcpContext::Write(uint8_t *buf, size_t size)
+{
+    int ret;
+    /* TODO: poll() wait for writable. */
+    ret = send(_fd, buf, size, MSG_NOSIGNAL);
+    return ret < 0 ? NetError() : ret;
 }
 
 int TcpContext::Open(const std::string &ip, const std::string &port)
